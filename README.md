@@ -1,5 +1,12 @@
 # Photoshop Web Clone
 
+[![Demo live](https://img.shields.io/badge/Demo-live-1473e6?style=for-the-badge&logo=github)](https://dplusos21.github.io/photoshop-web-clone/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Tech](https://img.shields.io/badge/Stack-HTML5%20%C2%B7%20JS%20%C2%B7%20PHP-blue?style=for-the-badge)]()
+
+> **▶ Prova subito la demo: https://dplusos21.github.io/photoshop-web-clone/**
+> *(modalità solo-frontend: il pulsante "Salva" scarica un file `.pswc.json` invece di salvare lato server)*
+
 Clone web di Adobe Photoshop realizzato con **HTML5 + JavaScript vanilla + PHP**.
 Replica visiva fedele all'interfaccia di Photoshop 2024+ (tema scuro/chiaro) e include
 un set funzionale di strumenti di editing raster con sistema multilivello,
@@ -8,6 +15,16 @@ cronologia undo/redo, filtri, regolazioni e backend di persistenza.
 > Stato: **MVP fase 1 funzionante**. È un editor raster *demo-completo*, non una
 > replica 1:1 di tutte le feature commerciali di Photoshop (PSD nativo,
 > Camera Raw, Generative Fill, smart objects/3D non sono inclusi).
+
+## Demo online
+
+La demo su GitHub Pages funziona offline-style: l'editor, i livelli, gli strumenti,
+i filtri e l'esportazione PNG/JPG/WebP sono tutti pienamente operativi nel
+browser. L'unica funzione non disponibile è il **salvataggio lato server** (richiede
+PHP) che viene sostituito automaticamente da un download del progetto in
+formato `.pswc.json`.
+
+Per la versione completa con persistenza utente, segui la sezione "Avvio rapido".
 
 ---
 

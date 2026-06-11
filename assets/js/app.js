@@ -1,9 +1,28 @@
 /* App entry point */
 (function () {
+    function showDemoBannerIfNeeded() {
+        if (!/github\.io$/i.test(location.hostname)) return;
+        const bar = document.createElement('div');
+        bar.id = 'demo-banner';
+        bar.innerHTML = `
+            <span class="demo-dot"></span>
+            <b>Modalità demo</b>
+            <span>— Backend PHP non disponibile su GitHub Pages. "Salva" scarica il progetto come file .pswc.json. Per la versione completa, clona il repo e lancia <code>php -S localhost:8000</code>.</span>
+            <button id="demo-banner-close" title="Chiudi">×</button>
+        `;
+        document.body.appendChild(bar);
+        document.body.classList.add('has-demo-banner');
+        document.getElementById('demo-banner-close').addEventListener('click', () => {
+            bar.remove();
+            document.body.classList.remove('has-demo-banner');
+        });
+    }
+
     function boot() {
         const editor = new window.PSEditor();
         window.editor = editor; // for debug
         editor.init();
+        showDemoBannerIfNeeded();
 
         // Register tools
         [

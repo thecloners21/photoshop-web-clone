@@ -258,6 +258,60 @@ body.ps-iconified #app-titlebar {
 }
 .ps-tooltip .shortcut { color: var(--text-muted); margin-left: 8px; }
 
+/* Demo banner (GitHub Pages) */
+#demo-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10002;
+    background: linear-gradient(90deg, #1473e6, #31a8ff);
+    color: #fff;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+#demo-banner b { font-weight: 700; }
+#demo-banner code {
+    background: rgba(0,0,0,.25);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+#demo-banner .demo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #aaff80;
+    box-shadow: 0 0 8px #aaff80;
+    animation: demo-pulse 1.8s ease-in-out infinite;
+}
+@keyframes demo-pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: .4; }
+}
+#demo-banner span { flex: 1; }
+#demo-banner button {
+    width: 22px; height: 22px;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 16px;
+    line-height: 1;
+}
+#demo-banner button:hover { background: rgba(0,0,0,.2); }
+body.has-demo-banner {
+    grid-template-rows: 28px 28px 28px 36px 28px 1fr 22px;
+    grid-template-areas:
+        "demo"
+        "titlebar"
+        "menubar"
+        "optionsbar"
+        "doctabs"
+        "workspace"
+        "statusbar";
+}
+body.has-demo-banner #demo-banner { position: static; grid-area: demo; }
+
 /* Generic icon button */
 .icon-btn {
     width: 22px; height: 22px;

@@ -1,0 +1,120 @@
+/* Tools panel (left) */
+#tools-panel {
+    background: var(--tools-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+}
+.tools-grip {
+    height: 14px;
+    background:
+        radial-gradient(circle, var(--text-dim) 1px, transparent 1.2px) 0 0 / 4px 4px;
+    margin: 2px 4px;
+    cursor: move;
+    opacity: .6;
+}
+.tools-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2px 0;
+}
+.tool-btn {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+    margin: 1px 0;
+    color: var(--text);
+    position: relative;
+    cursor: pointer;
+}
+.tool-btn:hover { background: var(--tool-hover); }
+.tool-btn.active {
+    background: var(--tool-active);
+    box-shadow: inset 2px 0 0 var(--tool-active-border);
+}
+.tool-btn svg { width: 18px; height: 18px; }
+.tool-btn .tool-arrow {
+    position: absolute;
+    right: 1px; bottom: 1px;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 0 4px 4px;
+    border-color: transparent transparent var(--text-muted) transparent;
+}
+
+/* Flyout (tool group expansion) */
+.tool-flyout {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--menu-dropdown-bg);
+    border: 1px solid var(--menu-dropdown-border);
+    padding: 2px 0;
+    z-index: 500;
+    box-shadow: 0 4px 14px rgba(0,0,0,.4);
+    min-width: 200px;
+}
+.tool-flyout-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    color: var(--text);
+    cursor: default;
+    gap: 8px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+.tool-flyout-row:hover {
+    background: var(--menu-item-hover);
+    color: var(--menu-item-hover-text);
+}
+.tool-flyout-row .key {
+    margin-left: auto;
+    color: var(--text-muted);
+    padding-left: 16px;
+}
+.tool-flyout-row:hover .key { color: rgba(255,255,255,.85); }
+
+/* Tools footer (colors) */
+.tools-footer {
+    border-top: 1px solid var(--border);
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    min-height: 110px;
+}
+.tool-color-swatch {
+    width: 22px; height: 22px;
+    border: 1px solid #000;
+    box-shadow: 0 0 0 1px #b0b0b0 inset;
+    cursor: pointer;
+    position: relative;
+}
+.tool-color-swatch.bg {
+    margin-top: -10px;
+    margin-left: 10px;
+}
+.tools-swap, .tools-default {
+    width: 14px; height: 14px;
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1;
+}
+.tools-swap:hover, .tools-default:hover { color: var(--text); }
+.tools-divider { width: 70%; height: 1px; background: var(--border); margin: 4px 0; }
+.tool-mode {
+    width: 22px; height: 22px;
+    color: var(--text-muted);
+    border-radius: 2px;
+}
+.tool-mode:hover { background: var(--tool-hover); color: var(--text); }
+.tool-mode.active { background: var(--tool-active); color: var(--text); }

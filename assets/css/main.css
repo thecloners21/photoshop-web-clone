@@ -1,0 +1,270 @@
+/* Photoshop Web — main layout & resets */
+* { box-sizing: border-box; }
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Adobe Clean", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 11px;
+    line-height: 1.3;
+    user-select: none;
+    -webkit-user-select: none;
+    color: var(--text);
+    background: var(--app-bg);
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+button {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+}
+
+input[type="text"], input[type="number"], select {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text);
+    padding: 3px 6px;
+    border-radius: 2px;
+    outline: none;
+    height: 22px;
+}
+input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+    background: var(--input-bg-focus);
+}
+
+.hidden { display: none !important; }
+
+body {
+    display: grid;
+    grid-template-rows: 28px 28px 36px 28px 1fr 22px;
+    grid-template-areas:
+        "titlebar"
+        "menubar"
+        "optionsbar"
+        "doctabs"
+        "workspace"
+        "statusbar";
+    height: 100vh;
+}
+
+#app-titlebar { grid-area: titlebar; }
+#menubar { grid-area: menubar; }
+#options-bar { grid-area: optionsbar; }
+#doc-tabs { grid-area: doctabs; }
+#workspace { grid-area: workspace; }
+#statusbar { grid-area: statusbar; }
+
+/* Title bar */
+#app-titlebar {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    background: var(--titlebar-bg);
+    border-bottom: 1px solid var(--border);
+    -webkit-app-region: drag;
+}
+.tb-app { display: flex; align-items: center; gap: 8px; }
+.tb-app-icon {
+    width: 18px; height: 18px;
+    background: linear-gradient(135deg, #001e36, #31a8ff);
+    color: #99e2ff;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+    font-family: "Adobe Clean", sans-serif;
+}
+.tb-app-name { font-weight: 600; font-size: 11px; }
+.tb-app-version { color: var(--text-muted); font-size: 10px; }
+.tb-center { flex: 1; }
+.tb-right { display: flex; gap: 2px; }
+.tb-icon-btn {
+    width: 28px; height: 22px;
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+}
+.tb-icon-btn:hover { background: var(--hover-bg); color: var(--text); }
+.tb-icon-btn.tb-close:hover { background: #e81123; color: #fff; }
+.tb-icon-btn svg { display: block; }
+
+/* Iconified state: hide everything except the title bar; show floating restore widget */
+body.ps-iconified > *:not(#app-titlebar):not(.ps-restore-pill):not(.dialog-overlay) {
+    display: none !important;
+}
+body.ps-iconified {
+    grid-template-rows: 28px;
+    grid-template-areas: "titlebar";
+    background: transparent;
+}
+body.ps-iconified #app-titlebar {
+    background: var(--titlebar-bg);
+    border-bottom: 1px solid var(--border);
+}
+.ps-restore-pill {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 6px 14px 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.4);
+    cursor: pointer;
+    color: var(--text);
+    z-index: 9999;
+    font-size: 11px;
+    font-weight: 600;
+}
+.ps-restore-pill:hover { background: var(--button-bg-hover); }
+.ps-restore-pill .ps-mini-logo {
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #001e36, #31a8ff);
+    color: #99e2ff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px;
+}
+
+/* Close screen */
+.ps-closed-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--app-bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 10001;
+    text-align: center;
+    font-size: 13px;
+}
+.ps-closed-screen .logo {
+    width: 80px; height: 80px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #001e36, #31a8ff);
+    color: #99e2ff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 36px;
+}
+.ps-closed-screen h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.ps-closed-screen p { margin: 0; color: var(--text-muted); max-width: 380px; line-height: 1.6; }
+.ps-closed-screen button {
+    margin-top: 4px;
+    padding: 8px 18px;
+    border-radius: 18px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.ps-closed-screen button:hover { background: var(--accent-hover); }
+
+/* Document tabs */
+#doc-tabs {
+    background: var(--doctabs-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    padding: 0 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.doc-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 8px 0 10px;
+    background: var(--doctab-bg);
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 11px;
+    margin-right: 1px;
+    white-space: nowrap;
+}
+.doc-tab.active {
+    background: var(--workspace-bg);
+    color: var(--text);
+    border-color: var(--border);
+}
+.doc-tab-close {
+    width: 14px; height: 14px;
+    color: var(--text-muted);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+.doc-tab-close:hover { background: var(--hover-bg); color: var(--text); }
+
+/* Workspace */
+#workspace {
+    display: grid;
+    grid-template-columns: 38px 1fr 280px;
+    grid-template-areas: "tools viewport panels";
+    background: var(--workspace-bg);
+    overflow: hidden;
+    min-height: 0;
+}
+
+#tools-panel { grid-area: tools; }
+#viewport-area { grid-area: viewport; }
+#panels-area { grid-area: panels; }
+
+/* Scrollbar styling Photoshop-like */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid var(--scrollbar-track);
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+::-webkit-scrollbar-corner { background: var(--scrollbar-track); }
+
+/* Tooltip floating */
+.ps-tooltip {
+    position: fixed;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    padding: 4px 8px;
+    border-radius: 2px;
+    font-size: 11px;
+    pointer-events: none;
+    z-index: 10000;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    white-space: nowrap;
+}
+.ps-tooltip .shortcut { color: var(--text-muted); margin-left: 8px; }
+
+/* Generic icon button */
+.icon-btn {
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    border-radius: 2px;
+    cursor: pointer;
+}
+.icon-btn:hover { background: var(--hover-bg); color: var(--text); }
+.icon-btn.active { color: var(--accent); }

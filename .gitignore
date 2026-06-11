@@ -1,0 +1,19 @@
+# Backend runtime data (user projects, assets, sqlite)
+backend/data/pswc.sqlite*
+backend/data/projects/*
+backend/data/assets/*
+!backend/data/projects/.gitkeep
+!backend/data/assets/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log

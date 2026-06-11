@@ -1,0 +1,29 @@
+/* Status bar */
+#statusbar {
+    background: var(--status-bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+.sb-zoom {
+    display: flex; align-items: center; gap: 2px;
+    border-right: 1px solid var(--border);
+    padding-right: 8px;
+}
+.sb-zoom input {
+    width: 50px;
+    height: 18px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text);
+    text-align: right;
+    padding: 0 4px;
+    border-radius: 2px;
+}
+.sb-info { border-right: 1px solid var(--border); padding-right: 8px; }
+.sb-progress { flex: 1; }
+.sb-tooltip { color: var(--text-muted); font-style: italic; }

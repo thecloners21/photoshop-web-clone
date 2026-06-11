@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="Photoshop Web Clone">
+    <title>Photoshop Web Clone</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/menubar.css">
+    <link rel="stylesheet" href="assets/css/toolbar.css">
+    <link rel="stylesheet" href="assets/css/options-bar.css">
+    <link rel="stylesheet" href="assets/css/workspace.css">
+    <link rel="stylesheet" href="assets/css/panels.css">
+    <link rel="stylesheet" href="assets/css/statusbar.css">
+    <link rel="stylesheet" href="assets/css/dialogs.css">
+    <link rel="stylesheet" href="assets/css/theme-dark.css">
+    <link rel="stylesheet" href="assets/css/theme-light.css">
+</head>
+<body>
+    <!-- Title bar with app icon and document tabs reference -->
+    <div id="app-titlebar">
+        <div class="tb-app">
+            <div class="tb-app-icon">Ps</div>
+            <span class="tb-app-name">Photoshop Web Clone</span>
+            <span class="tb-app-version">v 1.0 (beta)</span>
+        </div>
+        <div class="tb-center"></div>
+        <div class="tb-right">
+            <button class="tb-icon-btn" id="btn-toggle-theme" title="Cambia tema (dark/light)">
+                <svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 1a7 7 0 0 0 0 14 7 7 0 0 0 0-14zm0 1v12a6 6 0 0 1 0-12z" fill="currentColor"/></svg>
+            </button>
+            <button class="tb-icon-btn" id="btn-tb-minimize" title="Iconizza (riduci a barra)">
+                <svg viewBox="0 0 12 12" width="12" height="12"><path stroke="currentColor" stroke-width="1.2" d="M2 9h8" fill="none"/></svg>
+            </button>
+            <button class="tb-icon-btn" id="btn-tb-maximize" title="A tutto schermo (F11)">
+                <svg viewBox="0 0 12 12" width="12" height="12"><rect x="2" y="2" width="8" height="8" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+            </button>
+            <button class="tb-icon-btn tb-close" id="btn-tb-close" title="Chiudi">
+                <svg viewBox="0 0 12 12" width="12" height="12"><path stroke="currentColor" stroke-width="1.4" d="M2 2l8 8M10 2l-8 8" fill="none"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Menu bar -->
+    <nav id="menubar" role="menubar"></nav>
+
+    <!-- Options bar (contextual to tool) -->
+    <div id="options-bar"></div>
+
+    <!-- Document tabs -->
+    <div id="doc-tabs">
+        <div class="doc-tab active" data-doc-id="0">
+            <span class="doc-tab-name">Senza titolo-1 @ 100% (RGB/8)</span>
+            <button class="doc-tab-close" title="Chiudi documento">×</button>
+        </div>
+    </div>
+
+    <!-- Main workspace -->
+    <main id="workspace">
+        <!-- Tools panel (left vertical bar) -->
+        <aside id="tools-panel">
+            <div class="tools-grip" title="Trascina"></div>
+            <div class="tools-list" id="tools-list"></div>
+            <div class="tools-footer">
+                <button class="tool-color-swatch" id="fg-color-swatch" title="Colore primo piano (X per scambiare)" style="background:#000"></button>
+                <button class="tool-color-swatch bg" id="bg-color-swatch" title="Colore sfondo" style="background:#fff"></button>
+                <button class="tools-swap" id="btn-swap-colors" title="Scambia colori (X)">⇄</button>
+                <button class="tools-default" id="btn-default-colors" title="Colori predefiniti (D)">◧</button>
+                <div class="tools-divider"></div>
+                <button class="tool-mode" id="btn-quick-mask" title="Modalità maschera veloce (Q)">
+                    <svg viewBox="0 0 16 16" width="14" height="14"><rect x="2" y="2" width="12" height="12" fill="none" stroke="currentColor"/><circle cx="8" cy="8" r="3" fill="currentColor"/></svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Canvas viewport area -->
+        <section id="viewport-area">
+            <!-- Rulers -->
+            <div class="ruler-corner"></div>
+            <canvas id="ruler-top" class="ruler ruler-top"></canvas>
+            <canvas id="ruler-left" class="ruler ruler-left"></canvas>
+
+            <!-- Scrolling container -->
+            <div id="viewport-scroll">
+                <div id="viewport-content">
+                    <!-- Document stage -->
+                    <div id="document-stage" style="width:800px;height:600px;">
+                        <canvas id="bg-checker" class="doc-canvas"></canvas>
+                        <div id="layers-container"></div>
+                        <canvas id="overlay-canvas" class="doc-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrollbars overlay placeholder -->
+            <div class="viewport-scrollbar-h"></div>
+            <div class="viewport-scrollbar-v"></div>
+        </section>
+
+        <!-- Right panels area -->
+        <aside id="panels-area">
+            <!-- Mini icon column (collapsed panels) -->
+            <div id="panels-icons"></div>
+
+            <!-- Expanded panel stack -->
+            <div id="panels-stack">
+                <!-- Color / Swatches / Gradients group -->
+                <div class="panel-group" data-group="color">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" data-panel="color">Colore</button>
+                        <button class="panel-tab" data-panel="swatches">Campioni</button>
+                        <button class="panel-tab" data-panel="gradients">Sfumature</button>
+                    </div>
+                    <div class="panel-body" id="panel-color"></div>
+                    <div class="panel-body hidden" id="panel-swatches"></div>
+                    <div class="panel-body hidden" id="panel-gradients"></div>
+                </div>
+
+                <!-- Properties / Adjustments group -->
+                <div class="panel-group" data-group="properties">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" data-panel="properties">Proprietà</button>
+                        <button class="panel-tab" data-panel="adjustments">Regolazioni</button>
+                        <button class="panel-tab" data-panel="libraries">Libraries</button>
+                    </div>
+                    <div class="panel-body" id="panel-properties"></div>
+                    <div class="panel-body hidden" id="panel-adjustments"></div>
+                    <div class="panel-body hidden" id="panel-libraries"></div>
+                </div>
+
+                <!-- Layers / Channels / Paths group -->
+                <div class="panel-group panel-group-tall" data-group="layers">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" data-panel="layers">Livelli</button>
+                        <button class="panel-tab" data-panel="channels">Canali</button>
+                        <button class="panel-tab" data-panel="paths">Tracciati</button>
+                        <button class="panel-tab" data-panel="history">Storia</button>
+                    </div>
+                    <div class="panel-body" id="panel-layers"></div>
+                    <div class="panel-body hidden" id="panel-channels"></div>
+                    <div class="panel-body hidden" id="panel-paths"></div>
+                    <div class="panel-body hidden" id="panel-history"></div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Status bar -->
+    <footer id="statusbar">
+        <div class="sb-zoom">
+            <input type="text" id="sb-zoom-input" value="100" maxlength="5">
+            <span>%</span>
+        </div>
+        <div class="sb-info" id="sb-doc-info">Doc: 800 x 600 px • RGB/8 • 1.83 MB</div>
+        <div class="sb-progress"></div>
+        <div class="sb-tooltip" id="sb-tooltip">Pronto</div>
+    </footer>
+
+    <!-- Dialog: New Document -->
+    <div class="dialog-overlay hidden" id="dialog-new-doc">
+        <div class="dialog">
+            <div class="dialog-header">
+                <span>Nuovo documento</span>
+                <button class="dialog-close" data-close>×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="form-row">
+                    <label>Nome</label>
+                    <input type="text" id="newdoc-name" value="Senza titolo-1">
+                </div>
+                <div class="form-row form-row-inline">
+                    <div>
+                        <label>Larghezza</label>
+                        <input type="number" id="newdoc-width" value="1920" min="1" max="30000">
+                    </div>
+                    <div>
+                        <label>Altezza</label>
+                        <input type="number" id="newdoc-height" value="1080" min="1" max="30000">
+                    </div>
+                    <div>
+                        <label>Risoluzione</label>
+                        <input type="number" id="newdoc-dpi" value="72">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label>Contenuto sfondo</label>
+                    <select id="newdoc-bg">
+                        <option value="white">Bianco</option>
+                        <option value="black">Nero</option>
+                        <option value="transparent">Trasparente</option>
+                    </select>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn-secondary" data-close>Annulla</button>
+                <button class="btn-primary" id="newdoc-create">Crea</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog: Open file -->
+    <input type="file" id="hidden-file-input" accept="image/*" style="display:none">
+
+    <!-- Hidden save anchor -->
+    <a id="hidden-download-anchor" style="display:none"></a>
+
+    <!-- Scripts -->
+    <script src="assets/js/core/event-bus.js"></script>
+    <script src="assets/js/core/history.js"></script>
+    <script src="assets/js/core/layer.js"></script>
+    <script src="assets/js/core/document.js"></script>
+    <script src="assets/js/core/viewport.js"></script>
+    <script src="assets/js/core/editor.js"></script>
+    <script src="assets/js/tools/tool.js"></script>
+    <script src="assets/js/tools/move.js"></script>
+    <script src="assets/js/tools/select-rect.js"></script>
+    <script src="assets/js/tools/select-ellipse.js"></script>
+    <script src="assets/js/tools/lasso.js"></script>
+    <script src="assets/js/tools/magic-wand.js"></script>
+    <script src="assets/js/tools/crop.js"></script>
+    <script src="assets/js/tools/eyedropper.js"></script>
+    <script src="assets/js/tools/brush.js"></script>
+    <script src="assets/js/tools/pencil.js"></script>
+    <script src="assets/js/tools/eraser.js"></script>
+    <script src="assets/js/tools/bucket.js"></script>
+    <script src="assets/js/tools/text.js"></script>
+    <script src="assets/js/tools/hand.js"></script>
+    <script src="assets/js/tools/zoom.js"></script>
+    <script src="assets/js/ui/menubar.js"></script>
+    <script src="assets/js/ui/toolbar.js"></script>
+    <script src="assets/js/ui/options-bar.js"></script>
+    <script src="assets/js/ui/color-panel.js"></script>
+    <script src="assets/js/ui/layers-panel.js"></script>
+    <script src="assets/js/ui/history-panel.js"></script>
+    <script src="assets/js/ui/properties-panel.js"></script>
+    <script src="assets/js/ui/swatches-panel.js"></script>
+    <script src="assets/js/ui/modal.js"></script>
+    <script src="assets/js/ui/dialogs.js"></script>
+    <script src="assets/js/ui/theme.js"></script>
+    <script src="assets/js/filters.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

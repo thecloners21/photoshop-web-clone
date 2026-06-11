@@ -1,0 +1,81 @@
+/* Viewport area: rulers + scrollable canvas stage */
+#viewport-area {
+    position: relative;
+    background: var(--workspace-bg);
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    grid-template-rows: 20px 1fr;
+    grid-template-areas:
+        "corner ruler-top"
+        "ruler-left scroll";
+    overflow: hidden;
+    min-width: 0;
+}
+.ruler-corner {
+    grid-area: corner;
+    background: var(--ruler-bg);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+.ruler {
+    background: var(--ruler-bg);
+    display: block;
+}
+.ruler-top { grid-area: ruler-top; border-bottom: 1px solid var(--border); height: 20px; width: 100%; }
+.ruler-left { grid-area: ruler-left; border-right: 1px solid var(--border); width: 20px; height: 100%; }
+
+#viewport-scroll {
+    grid-area: scroll;
+    overflow: auto;
+    position: relative;
+    background: var(--workspace-bg);
+}
+#viewport-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    min-width: max-content;
+    min-height: max-content;
+}
+#document-stage {
+    position: relative;
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,.5),
+        0 8px 24px rgba(0,0,0,.5);
+    background: transparent;
+    overflow: hidden;
+}
+.stage-inner {
+    position: absolute;
+    top: 0; left: 0;
+}
+.doc-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+#layers-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+}
+#layers-container canvas {
+    position: absolute;
+    top: 0; left: 0;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+#overlay-canvas {
+    pointer-events: auto;
+    cursor: crosshair;
+    z-index: 10;
+}
+.viewport-scrollbar-h, .viewport-scrollbar-v { display: none; }
+
+/* Selection marching ants overlay drawn on overlay-canvas via JS */

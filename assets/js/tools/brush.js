@@ -1,4 +1,4 @@
-/* Brush tool — soft round brush with hardness, opacity, flow, smoothing */
+/* Brush tool — soft round brush with hardness, opacity, flow, blend mode */
 (function () {
     class BrushTool extends window.PSTool {
         constructor() {
@@ -10,30 +10,44 @@
             this._stroking = false;
             this._last = null;
             this._before = null;
+            this._cursorPos = null;
+            this.blendMode = 'source-over';
         }
-        onActivate(editor) { super.onActivate(editor); document.getElementById('overlay-canvas').style.cursor = 'crosshair'; }
+        onActivate(editor) {
+            super.onActivate(editor);
+            document.getElementById('overlay-canvas').style.cursor = 'none';
+        }
+        onDeactivate() {
+            this._cursorPos = null;
+            document.getElementById('overlay-canvas').style.cursor = 'crosshair';
+        }
         onPointerDown(p, editor) {
             const layer = editor.activeDoc.getActiveLayer();
-            if (!layer || layer.locked) return;
+            if (!layer) return;
+            if (layer.locked) { window.PSBus.emit('status:flash', 'Livello bloccato — sblocca dal pannello Livelli per dipingere'); return; }
             this._stroking = true;
             this._before = layer.snapshot();
             this._last = { x: p.x, y: p.y };
             this._stamp(layer, p.x, p.y, editor);
+            editor.requestRedraw();
         }
         onPointerMove(p, editor) {
-            if (!this._stroking) return;
-            const layer = editor.activeDoc.getActiveLayer();
-            if (!layer) return;
-            const dx = p.x - this._last.x;
-            const dy = p.y - this._last.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const step = Math.max(1, editor.brushSize * 0.15);
-            const steps = Math.ceil(dist / step);
-            for (let i = 1; i <= steps; i++) {
-                const t = i / steps;
-                this._stamp(layer, this._last.x + dx * t, this._last.y + dy * t, editor);
+            if (this._stroking) {
+                const layer = editor.activeDoc.getActiveLayer();
+                if (layer) {
+                    const dx = p.x - this._last.x;
+                    const dy = p.y - this._last.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const step = Math.max(1, editor.brushSize * 0.15);
+                    const steps = Math.ceil(dist / step);
+                    for (let i = 1; i <= steps; i++) {
+                        const t = i / steps;
+                        this._stamp(layer, this._last.x + dx * t, this._last.y + dy * t, editor);
+                    }
+                    this._last = { x: p.x, y: p.y };
+                }
             }
-            this._last = { x: p.x, y: p.y };
+            this._cursorPos = { x: p.x, y: p.y };
             editor.requestRedraw();
         }
         onPointerUp(p, editor) {
@@ -41,47 +55,62 @@
             this._stroking = false;
             const layer = editor.activeDoc.getActiveLayer();
             if (layer && this._before) {
-                const after = layer.snapshot();
-                editor.pushPaintHistory(layer, this._before, after, 'Pennello');
+                editor.pushPaintHistory(layer, this._before, layer.snapshot(), 'Pennello');
             }
             this._before = null;
             this._last = null;
+        }
+        onPointerLeave(p, editor) {
+            this._cursorPos = null;
+            editor.requestRedraw();
+        }
+        drawOverlay(ctx, editor) {
+            if (!this._cursorPos) return;
+            const r = editor.brushSize / 2;
+            ctx.save();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(this._cursorPos.x, this._cursorPos.y, r, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.strokeStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(this._cursorPos.x, this._cursorPos.y, Math.max(0, r - 1), 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
         }
         _stamp(layer, x, y, editor) {
             const ctx = layer.ctx;
             const r = editor.brushSize / 2;
             ctx.save();
+            ctx.globalCompositeOperation = this.blendMode || 'source-over';
             ctx.globalAlpha = editor.brushOpacity;
-            const grad = ctx.createRadialGradient(x, y, r * editor.brushHardness, x, y, r);
             const fg = editor.fgColor;
-            grad.addColorStop(0, fg);
-            grad.addColorStop(1, fg + '00');
-            ctx.fillStyle = editor.brushHardness >= 1 ? fg : grad;
+            if (editor.brushHardness >= 1) {
+                ctx.fillStyle = fg;
+            } else {
+                const grad = ctx.createRadialGradient(x, y, r * editor.brushHardness, x, y, r);
+                grad.addColorStop(0, fg);
+                grad.addColorStop(1, fg + '00');
+                ctx.fillStyle = grad;
+            }
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
         }
-        drawOverlay(ctx, editor) {
-            // cursor circle preview could be drawn here; skipped to avoid pointer jitter
-        }
         renderOptions(container, editor) {
             container.innerHTML = `
                 <div class="ob-group">
-                    <span class="ob-brush-preview" id="brush-preview" style="color:${editor.fgColor}">
-                        <span class="dot"></span>
-                        <span class="ob-brush-size" id="brush-size-label">${editor.brushSize} px</span>
-                    </span>
+                    <span class="ob-label">Dim:</span>
+                    <input type="range" class="ob-range" id="brush-size-range" min="1" max="500" value="${editor.brushSize}">
+                    <input type="number" class="ob-input ob-input-num" id="brush-size" value="${editor.brushSize}" min="1" max="2000">
+                    <span class="ob-label">px</span>
                 </div>
                 <div class="ob-group">
-                    <span class="ob-label">Modo:</span>
-                    <select class="ob-select">
-                        <option>Normale</option>
-                        <option>Dissolvi</option>
-                        <option>Moltiplica</option>
-                        <option>Scolora</option>
-                        <option>Sovrapponi</option>
-                    </select>
+                    <span class="ob-label">Durezza:</span>
+                    <input type="range" class="ob-range" id="brush-hardness-range" min="0" max="100" value="${Math.round(editor.brushHardness * 100)}">
+                    <input type="number" class="ob-input ob-input-num" id="brush-hardness" value="${Math.round(editor.brushHardness * 100)}" min="0" max="100">%
                 </div>
                 <div class="ob-group">
                     <span class="ob-label">Opacità:</span>
@@ -92,35 +121,50 @@
                     <input type="number" class="ob-input ob-input-num" id="brush-flow" value="${Math.round(editor.brushFlow * 100)}" min="0" max="100">%
                 </div>
                 <div class="ob-group">
-                    <span class="ob-label">Lisciatura:</span>
-                    <input type="number" class="ob-input ob-input-num" id="brush-smooth" value="${editor.brushSmoothing}" min="0" max="100">%
-                </div>
-                <div class="ob-group">
-                    <span class="ob-label">Durezza:</span>
-                    <input type="number" class="ob-input ob-input-num" id="brush-hardness" value="${Math.round(editor.brushHardness * 100)}" min="0" max="100">%
-                </div>
-                <div class="ob-group">
-                    <span class="ob-label">Dim:</span>
-                    <input type="number" class="ob-input ob-input-num" id="brush-size" value="${editor.brushSize}" min="1" max="2000">
+                    <span class="ob-label">Modo:</span>
+                    <select class="ob-select" id="brush-mode">
+                        <option value="source-over">Normale</option>
+                        <option value="multiply">Moltiplica</option>
+                        <option value="screen">Scolora</option>
+                        <option value="overlay">Sovrapponi</option>
+                        <option value="darken">Scurisci</option>
+                        <option value="lighten">Schiarisci</option>
+                        <option value="color-dodge">Sovraesp. colore</option>
+                        <option value="color-burn">Sottoesp. colore</option>
+                    </select>
                 </div>
             `;
-            container.querySelector('#brush-opacity').addEventListener('input', e => editor.brushOpacity = (parseInt(e.target.value, 10) || 0) / 100);
-            container.querySelector('#brush-flow').addEventListener('input', e => editor.brushFlow = (parseInt(e.target.value, 10) || 0) / 100);
-            container.querySelector('#brush-smooth').addEventListener('input', e => editor.brushSmoothing = parseInt(e.target.value, 10) || 0);
-            container.querySelector('#brush-hardness').addEventListener('input', e => editor.brushHardness = (parseInt(e.target.value, 10) || 0) / 100);
-            const sz = container.querySelector('#brush-size');
-            sz.addEventListener('input', e => {
-                editor.brushSize = parseInt(e.target.value, 10) || 1;
-                window.PSBus.emit('brush:size', editor.brushSize);
-            });
-            window.PSBus.on('brush:size', s => {
-                if (sz) sz.value = s;
-                const lbl = container.querySelector('#brush-size-label');
-                if (lbl) lbl.textContent = s + ' px';
-            });
-            window.PSBus.on('color:fg', c => {
-                const p = container.querySelector('#brush-preview');
-                if (p) p.style.color = c;
+            const sizeIn = container.querySelector('#brush-size');
+            const sizeRange = container.querySelector('#brush-size-range');
+            const hardIn = container.querySelector('#brush-hardness');
+            const hardRange = container.querySelector('#brush-hardness-range');
+
+            const setSize = (v) => {
+                v = Math.max(1, Math.min(2000, parseInt(v, 10) || 1));
+                editor.brushSize = v;
+                sizeIn.value = v;
+                sizeRange.value = Math.min(500, v);
+                window.PSBus.emit('brush:size', v);
+            };
+            const setHardness = (v) => {
+                v = Math.max(0, Math.min(100, parseInt(v, 10) || 0));
+                editor.brushHardness = v / 100;
+                hardIn.value = v;
+                hardRange.value = v;
+            };
+            sizeIn.addEventListener('input', e => setSize(e.target.value));
+            sizeRange.addEventListener('input', e => setSize(e.target.value));
+            hardIn.addEventListener('input', e => setHardness(e.target.value));
+            hardRange.addEventListener('input', e => setHardness(e.target.value));
+
+            container.querySelector('#brush-opacity').addEventListener('input', e => editor.brushOpacity = Math.max(0, Math.min(100, parseInt(e.target.value, 10) || 0)) / 100);
+            container.querySelector('#brush-flow').addEventListener('input', e => editor.brushFlow = Math.max(0, Math.min(100, parseInt(e.target.value, 10) || 0)) / 100);
+            container.querySelector('#brush-mode').addEventListener('change', e => this.blendMode = e.target.value);
+
+            // Sync the input when [/] keyboard shortcuts fire
+            this._brushBusUnsub && this._brushBusUnsub();
+            this._brushBusUnsub = window.PSBus.on('brush:size', s => {
+                if (document.body.contains(sizeIn)) { sizeIn.value = s; sizeRange.value = Math.min(500, s); }
             });
         }
     }

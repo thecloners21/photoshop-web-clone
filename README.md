@@ -1,11 +1,14 @@
 # Photoshop Web Clone
 
-[![Demo live](https://img.shields.io/badge/Demo-live-1473e6?style=for-the-badge&logo=github)](https://dplusos21.github.io/photoshop-web-clone/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Tech](https://img.shields.io/badge/Stack-HTML5%20%C2%B7%20JS%20%C2%B7%20PHP-blue?style=for-the-badge)]()
+<p>
+  <a href="https://dplusos21.github.io/photoshop-web-clone/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Demo-live-1473e6?style=for-the-badge&logo=github" alt="Demo live"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT"></a>
+  <img src="https://img.shields.io/badge/Stack-HTML5%20%C2%B7%20JS%20%C2%B7%20PHP-blue?style=for-the-badge" alt="Stack">
+</p>
 
-> **▶ Prova subito la demo: https://dplusos21.github.io/photoshop-web-clone/**
-> *(modalità solo-frontend: il pulsante "Salva" scarica un file `.pswc.json` invece di salvare lato server)*
+> <b>▶ Prova subito la demo</b> (apre in una nuova scheda):
+> <a href="https://dplusos21.github.io/photoshop-web-clone/" target="_blank" rel="noopener noreferrer">https://dplusos21.github.io/photoshop-web-clone/</a>
+> <br>*(modalità solo-frontend: il pulsante "Salva" scarica un file `.pswc.json` invece di salvare lato server)*
 
 Clone web di Adobe Photoshop realizzato con **HTML5 + JavaScript vanilla + PHP**.
 Replica visiva fedele all'interfaccia di Photoshop 2024+ (tema scuro/chiaro) e include

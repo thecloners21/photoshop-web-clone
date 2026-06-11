@@ -11,7 +11,8 @@
         }
         onPointerDown(p, editor) {
             const layer = editor.activeDoc.getActiveLayer();
-            if (!layer || layer.locked) return;
+            if (!layer) return;
+            if (layer.locked) { window.PSBus.emit('status:flash', 'Livello bloccato'); return; }
             const before = layer.snapshot();
             const img = layer.ctx.getImageData(0, 0, layer.width, layer.height);
             const data = img.data;

@@ -453,7 +453,44 @@
                 buttons: [{ label: 'Chiudi', kind: 'primary', value: true, default: true }],
             }),
         };
+        // Map free-text mode/transform/style menu items
+        Object.assign(map, {
+            'mode-rgb':   () => { editor.activeDoc.colorMode = 'RGB/8'; window.PSBus.emit('doc:changed', editor.activeDoc); window.PSBus.emit('status:flash', 'Metodo: RGB/8'); },
+            'mode-cmyk':  () => window.PSModal.alert('Conversione CMYK non disponibile (richiede gestione colore ICC).', 'Non ancora disponibile', '⚠'),
+            'mode-gray':  () => { if (window.PSFilters) window.PSFilters.grayscale(editor); },
+            'mode-bitmap':() => window.PSModal.alert('Conversione bitmap (1 bit) non ancora disponibile.', 'Non ancora disponibile', '⚠'),
+            'crop-apply': () => { const t = editor.tools.crop; if (t && t.commit) t.commit(editor); },
+            'tx-flip-h':  () => window.PSImg && window.PSImg.flip(editor, 'h'),
+            'tx-flip-v':  () => window.PSImg && window.PSImg.flip(editor, 'v'),
+            'tx-rotate':  () => window.PSImg && window.PSImg.rotate(editor, 90),
+            'select-all-layers':  () => window.PSBus.emit('status:flash', 'Selezione multipla livelli: prossima versione'),
+            'deselect-layers':    () => window.PSBus.emit('status:flash', 'Deselezione livelli: prossima versione'),
+            'cut':   () => window.PSBus.emit('status:flash', 'Taglia: prossima versione (usa copia + elimina)'),
+            'copy':  () => window.PSBus.emit('status:flash', 'Copia negli appunti: prossima versione'),
+            'paste': () => window.PSBus.emit('status:flash', 'Incolla: prossima versione'),
+            'copy-merged': () => window.PSBus.emit('status:flash', 'Copia con unione: prossima versione'),
+            'fill':   () => window.PSFilters && window.PSFilters.balance ? null : null,
+            'reselect': () => window.PSBus.emit('status:flash', 'Riseleziona: prossima versione'),
+        });
+
         Object.keys(map).forEach(k => window.PSBus.on('menu:' + k, map[k]));
+
+        // Generic fallback for unimplemented menu actions
+        const seen = new Set(Object.keys(map));
+        MENUS.forEach(function recurse(menu) {
+            (menu.items || []).forEach(it => {
+                if (it.action && !seen.has(it.action)) {
+                    seen.add(it.action);
+                    window.PSBus.on('menu:' + it.action, () => {
+                        window.PSModal.alert(
+                            `La voce di menu "${it.label}" non è ancora implementata in questa versione.\n\nQuesta è una demo MVP del clone: alcune funzioni avanzate di Photoshop (smart objects, stili di livello, Camera Raw, PSD nativo, ecc.) sono pianificate per le fasi 2 e 3.`,
+                            'Funzione non disponibile', 'ℹ'
+                        );
+                    });
+                }
+                if (it.submenu) recurse({ items: it.submenu });
+            });
+        });
     }
 
     window.PSUI = window.PSUI || {};

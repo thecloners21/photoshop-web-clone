@@ -134,6 +134,37 @@
         root.querySelector('#btn-layer-new').addEventListener('click', () => addLayer());
         root.querySelector('#btn-layer-delete').addEventListener('click', () => deleteActive());
         root.querySelector('#btn-layer-group').addEventListener('click', () => addLayer('Gruppo'));
+        root.querySelector('#btn-layer-link').addEventListener('click', () =>
+            window.PSBus.emit('status:flash', 'Collegamento livelli: prossima versione'));
+        root.querySelector('#btn-layer-fx').addEventListener('click', () =>
+            window.PSModal.alert('Stili di livello (ombra, glow, traccia) sono previsti nella fase 2.', 'Non ancora disponibile', 'fx'));
+        root.querySelector('#btn-layer-mask').addEventListener('click', () =>
+            window.PSModal.alert('Maschere di livello sono previste nella fase 2.', 'Non ancora disponibile', '▢'));
+        root.querySelector('#btn-layer-adj').addEventListener('click', () =>
+            window.PSModal.alert('Livelli di regolazione non distruttivi: prossima versione.\nNel frattempo applica regolazioni direttamente dal menu Immagine > Regolazioni.', 'Non ancora disponibile', '◐'));
+
+        // Lock toolbar
+        const lockBtns = {
+            'lock-tr':  () => { const l = editor.activeDoc.getActiveLayer(); if (l) { l.lockTransparency = !l.lockTransparency; refreshLocks(); } },
+            'lock-px':  () => { const l = editor.activeDoc.getActiveLayer(); if (l) { l.locked = !l.locked; refreshLocks(); window.PSBus.emit('status:flash', 'Livello ' + (l.locked ? 'bloccato' : 'sbloccato')); } },
+            'lock-pos': () => { const l = editor.activeDoc.getActiveLayer(); if (l) { l.lockPosition = !l.lockPosition; refreshLocks(); } },
+            'lock-all': () => { const l = editor.activeDoc.getActiveLayer(); if (!l) return; const next = !l.locked; l.locked = next; l.lockTransparency = next; l.lockPosition = next; refreshLocks(); window.PSBus.emit('status:flash', 'Livello ' + (next ? 'bloccato' : 'sbloccato')); },
+        };
+        Object.keys(lockBtns).forEach(id => {
+            const b = root.querySelector('#' + id);
+            if (b) b.addEventListener('click', lockBtns[id]);
+        });
+        function refreshLocks() {
+            const l = editor.activeDoc.getActiveLayer();
+            if (!l) return;
+            root.querySelector('#lock-tr').classList.toggle('active', !!l.lockTransparency);
+            root.querySelector('#lock-px').classList.toggle('active', !!l.locked);
+            root.querySelector('#lock-pos').classList.toggle('active', !!l.lockPosition);
+            root.querySelector('#lock-all').classList.toggle('active', !!(l.locked && l.lockTransparency && l.lockPosition));
+            editor.requestRedraw();
+        }
+        window.PSBus.on('doc:active-layer', refreshLocks);
+        window.PSBus.on('doc:layers-changed', refreshLocks);
         window.PSBus.on('layers:new', addLayer);
         window.PSBus.on('layers:delete', deleteActive);
         window.PSBus.on('layers:duplicate', duplicateActive);

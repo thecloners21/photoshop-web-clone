@@ -23,7 +23,9 @@
                     height: this.height,
                     fill: opts.bg === 'transparent' ? null : (opts.bg === 'black' ? '#000' : '#fff'),
                 });
-                bg.locked = opts.bg !== 'transparent';
+                // Background is editable by default for a smooth demo UX
+                // (Photoshop locks it, but users expect to paint immediately).
+                bg.locked = false;
                 this.addLayer(bg);
             }
         }
